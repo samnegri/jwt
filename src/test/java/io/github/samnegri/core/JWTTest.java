@@ -2,22 +2,22 @@ package io.github.samnegri.core;
 
 import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class JWTTest {
 
     @Test
-    public void createTest() throws NoSuchAlgorithmException, UnsupportedEncodingException, InvalidKeyException {
+    public void createTest() throws Exception {
+        String json = "{\"foo\":\"bar\"}";
         JWT jwt = JWT.newInstance()
-            .algorithm("")
-            .secret("secret");
-        String s = jwt.create("{\"foo\":\"bar\"}");
-        System.out.println(s);
-        assertNotNull(s);
+            .algorithm(Algorithm.HMACSHA256)
+            .secret("secret")
+            .payload(json);
+        String signedJson = jwt.create();
+        System.out.println(signedJson);
+        assertNotNull(signedJson);
+        assertTrue(jwt.validate(json,"PzqzmGtlarsXrz6xRD7WwI74//n+qDkVkJ0bQhrsib4="));
     }
 
 }
