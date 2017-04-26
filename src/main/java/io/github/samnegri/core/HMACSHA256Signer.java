@@ -8,8 +8,18 @@ import java.security.NoSuchAlgorithmException;
 
 public class HMACSHA256Signer implements Signer {
 
+    private final byte[] secret;
+
+    private HMACSHA256Signer(byte[] secret) {
+        this.secret = secret;
+    }
+
+    public static Signer getInstance(byte[] secret) {
+        return new HMACSHA256Signer(secret);
+    }
+
     @Override
-    public byte[] sign(byte[] toBeSigned, byte[] secret) {
+    public byte[] sign(byte[] toBeSigned) {
         try {
             Mac hmacSHA256 = Mac.getInstance(Algorithm.HMACSHA256.getCode());
             Key key = new SecretKeySpec(secret, Algorithm.HMACSHA256.getCode());
@@ -20,9 +30,5 @@ public class HMACSHA256Signer implements Signer {
         } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static Signer getInstance() {
-        return new HMACSHA256Signer();
     }
 }

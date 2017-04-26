@@ -2,6 +2,7 @@ package io.github.samnegri.core;
 
 public class JWTHeader {
 
+    private String alg;
     private String iss;
     private String sub;
     private String aud;
@@ -11,6 +12,20 @@ public class JWTHeader {
     private String jti;
     private String typ;
     private String cty;
+
+    public JWTHeader(String alg, String iss, String sub, String aud, String exp, String nbf,
+                     String iat, String jti, String typ, String cty) {
+        this.alg = alg;
+        this.iss = iss;
+        this.sub = sub;
+        this.aud = aud;
+        this.exp = exp;
+        this.nbf = nbf;
+        this.iat = iat;
+        this.jti = jti;
+        this.typ = typ;
+        this.cty = cty;
+    }
 
     public String getIss() {
         return iss;
@@ -48,11 +63,11 @@ public class JWTHeader {
         return cty;
     }
 
-    public Builder builder(){
+    public static Builder builder() {
         return new Builder();
     }
 
-    class Builder {
+    static class Builder {
         private String iss;
         private String sub;
         private String aud;
@@ -62,9 +77,15 @@ public class JWTHeader {
         private String jti;
         private String typ;
         private String cty;
+        private String alg;
 
         Builder() {
             this.typ = "JWT";
+        }
+
+        public Builder alg(String alg) {
+            this.alg = alg;
+            return this;
         }
 
         public Builder iss(String iss) {
@@ -110,6 +131,10 @@ public class JWTHeader {
         public Builder cty(String cty) {
             this.cty = cty;
             return this;
+        }
+
+        public JWTHeader build() {
+            return new JWTHeader(alg, iss, sub, aud, exp, nbf, iat, jti, typ, cty);
         }
     }
 }

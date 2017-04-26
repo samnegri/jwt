@@ -12,7 +12,8 @@ public class JWTTest {
     @Test
     public void createTest() throws UnsupportedEncodingException {
         String json = "{\"foo\":\"bar\"}";
-        JWT jwt = JWT.newInstance(Algorithm.HMACSHA256, "secret".getBytes(JWT.ENCODING), json, JWT.ENCODING);
+        String charsetName = "UTF-8";
+        JWT jwt = JWT.newInstance(Algorithm.HMACSHA256, "secret".getBytes(charsetName), json, charsetName);
         String signedJson = jwt.create();
         System.out.println(signedJson);
         assertNotNull(signedJson);
