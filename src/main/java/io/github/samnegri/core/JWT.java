@@ -1,48 +1,54 @@
 package io.github.samnegri.core;
 
-import javax.xml.bind.DatatypeConverter;
-import java.sql.Blob;
+import io.github.samnegri.core.util.Base64;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 
 public class JWT {
     public static String ENCODING = "UTF-8";
-    private Algorithm algorithm;
-    private String secret;
-    private String payload;
+    private final Algorithm algorithm;
+    private final byte[] secret;
+    private final String payload;
+    private final String encoding;
 
-    public static JWT newInstance() {
-        return new JWT();
-    }
-
-    public JWT algorithm(Algorithm algorithm) {
+    private JWT(Algorithm algorithm, byte[] secret, String payload, String encoding) {
         this.algorithm = algorithm;
-        return this;
-    }
-
-    public String create() throws Exception {
-        String header = algorithm.getHeader();
-        String payload64 = DatatypeConverter.printBase64Binary(payload.getBytes(ENCODING));
-        String header64 = DatatypeConverter.printBase64Binary(header.getBytes(ENCODING));
-        Signer signer = algorithm.getSigner();
-        byte[] toBeSigned = (payload64 + "." + header64).getBytes(ENCODING);
-        byte[] signed = signer.sign(toBeSigned, secret.getBytes(ENCODING));
-        String jwtSignature = DatatypeConverter.printBase64Binary(signed);
-        return String.join(".", header64, payload64, jwtSignature);
-    }
-
-    public boolean validate(String s, String signed) throws Exception {
-        Signer signer = algorithm.getSigner();
-        byte[] toBeValidated = s.getBytes("UTF-8");
-        toBeValidated = signer.sign(toBeValidated, secret.getBytes("UTF-8"));
-        return DatatypeConverter.printBase64Binary(toBeValidated).equals(signed);
-    }
-
-    public JWT secret(String secret) {
         this.secret = secret;
-        return this;
+        this.payload = payload;
+        this.encoding = encoding;
     }
 
-    public JWT payload(String payload) {
-        this.payload = payload;
-        return this;
+    public static JWT newInstance(Algorithm algorithm, byte[] secret, String payload, String encoding) {
+        return new JWT(algorithm, secret, payload, encoding);
+    }
+
+    public String create() {
+        try {
+            byte[] header = "{ \"alg\":\"HS256\", \"typ\":\"JWT\"}".getBytes(encoding);
+            String header64encoded = Base64.encodeURLBase64(header);
+            String payload64encoded = Base64.encodeURLBase64(payload.getBytes(encoding));
+
+            Signer signer = algorithm.getSigner();
+            return Optional.of(String.join(".", header64encoded, payload64encoded).getBytes(encoding))
+                .map(data -> signer.sign(data, secret))
+                .map(Base64::encodeURLBase64)
+                .map(jwtSignature -> String.join(".", header64encoded, payload64encoded, jwtSignature))
+                .get();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean validate(String data, String signed) {
+        try {
+            Signer signer = algorithm.getSigner();
+            return Optional.of(data.getBytes(encoding))
+                .map(bytes -> signer.sign(bytes, secret))
+                .map(Base64::encodeURLBase64)
+                .get().equals(signed);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

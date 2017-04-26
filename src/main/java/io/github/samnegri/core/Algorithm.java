@@ -1,16 +1,14 @@
 package io.github.samnegri.core;
 
 public enum Algorithm {
-    HMACSHA256("HmacSHA256", HMACSHA256Signer.getInstance(), "{ \"alg\":\"HS256\", \"typ\":\"JWT\"}");
+    HMACSHA256("HmacSHA256", HMACSHA256Signer.getInstance());
 
     private final String code;
     private final Signer signer;
-    private final String header;
 
-    Algorithm(String code, Signer signer, String header) {
+    Algorithm(String code, Signer signer) {
         this.code = code;
         this.signer = signer;
-        this.header = header;
     }
 
     public String getCode() {
@@ -21,7 +19,4 @@ public enum Algorithm {
         return signer;
     }
 
-    public String getHeader() {
-        return header;
-    }
 }

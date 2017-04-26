@@ -2,6 +2,6 @@ package io.github.samnegri.core;
 
 public interface Signer {
 
-    byte[] sign(byte[] toBeSigned, byte[] secret) throws Exception;
+    byte[] sign(byte[] toBeSigned, byte[] secret);
 
 }
