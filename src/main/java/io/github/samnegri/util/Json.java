@@ -1,4 +1,4 @@
-package io.github.samnegri.core.util;
+package io.github.samnegri.util;
 
 import com.google.gson.Gson;
 

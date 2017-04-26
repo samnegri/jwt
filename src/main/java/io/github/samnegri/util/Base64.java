@@ -1,4 +1,4 @@
-package io.github.samnegri.core.util;
+package io.github.samnegri.util;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
