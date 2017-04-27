@@ -1,59 +1,33 @@
 package io.github.samnegri.core;
 
-import io.github.samnegri.util.Base64;
-import io.github.samnegri.util.Json;
-
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JWT {
-    private final Base64 base64;
-    private final Signer signer;
+    private Map<String, String> header;
+    private String payload;
+    private String signature;
 
-    private JWT(Algorithm algorithm, byte[] secret, String encoding) {
-        this.signer = JWTSignerFactory.getSignerFor(algorithm, secret);
-        base64 = Base64.newInstance(encoding);
+    public JWT(String payload) {
+        this.payload = payload;
+        this.header = new HashMap<>();
     }
 
-    public static JWT newInstance(Algorithm algorithm, byte[] secret, String encoding) {
-        return new JWT(algorithm, secret, encoding);
+    JWT(Map<String,String> header, String payload, String signature) {
+        this.payload = payload;
+        this.header = header;
+        this.signature = signature;
     }
 
-    public String create(String payload) {
-        JWTHeader header = JWTHeader.builder()
-            .alg(signer.getAlgorithm().getName())
-            .build();
-        String header64encoded = prepareHeader(header);
-        String payload64encoded = preparePayload(payload);
-
-        return Optional.of(String.join(".", header64encoded, payload64encoded))
-            .map(base64::getBytes)
-            .map(signer::sign)
-            .map(base64::encodeURLBase64)
-            .map(jwtSignature -> String.join(".", header64encoded, payload64encoded, jwtSignature))
-            .get();
+    public Map<String,String> getHeader() {
+        return header;
     }
 
-    public boolean validate(String data, String signed) {
-        return Optional.of(data)
-            .map(base64::getBytes)
-            .map(signer::sign)
-            .map(base64::encodeURLBase64)
-            .map(signed::equals)
-            .get();
+    public String getPayload() {
+        return payload;
     }
 
-    private String preparePayload(String payload) {
-        return Optional.of(payload)
-            .map(base64::getBytes)
-            .map(base64::encodeURLBase64)
-            .get();
-    }
-
-    private String prepareHeader(JWTHeader header) {
-        return Optional.of(header)
-            .map(Json::toJson)
-            .map(base64::getBytes)
-            .map(base64::encodeURLBase64)
-            .get();
+    public String getSignature() {
+        return signature;
     }
 }

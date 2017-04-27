@@ -24,9 +24,25 @@ public class Base64 {
             .get();
     }
 
+    public byte[] decodeURLBase64(String data) {
+        return Optional.of(data)
+            .map(base64 -> base64.replace('/', '_'))
+            .map(base64 -> base64.replace('+', '-'))
+            .map(DatatypeConverter::parseBase64Binary)
+            .get();
+    }
+
     public byte[] getBytes(String json) {
         try {
             return json.getBytes(encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String parseString(byte[] bytes) {
+        try {
+            return new String(bytes,encoding);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
