@@ -6,12 +6,10 @@ import io.github.samnegri.util.Json;
 import java.util.Optional;
 
 public class JWT {
-    private final Algorithm algorithm;
     private final Base64 base64;
     private final Signer signer;
 
     private JWT(Algorithm algorithm, byte[] secret, String encoding) {
-        this.algorithm = algorithm;
         this.signer = JWTSignerFactory.getSignerFor(algorithm, secret);
         base64 = Base64.newInstance(encoding);
     }
@@ -22,7 +20,7 @@ public class JWT {
 
     public String create(String payload) {
         JWTHeader header = JWTHeader.builder()
-            .alg(algorithm.getName())
+            .alg(signer.getAlgorithm().getName())
             .build();
         String header64encoded = prepareHeader(header);
         String payload64encoded = preparePayload(payload);

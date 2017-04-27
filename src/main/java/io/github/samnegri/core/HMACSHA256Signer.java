@@ -31,4 +31,9 @@ public class HMACSHA256Signer implements Signer {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public Algorithm getAlgorithm() {
+        return Algorithm.HMACSHA256;
+    }
 }
