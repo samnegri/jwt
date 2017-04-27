@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JWT {
-    private Map<String, String> header;
-    private String payload;
+    private final Map<String, String> header;
+    private final String payload;
     private String signature;
 
     public JWT(String payload) {

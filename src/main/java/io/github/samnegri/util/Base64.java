@@ -47,4 +47,17 @@ public class Base64 {
             throw new RuntimeException(e);
         }
     }
+
+    public String wrap(String payload) {
+        return Optional.of(payload)
+            .map(this::getBytes)
+            .map(this::encodeURLBase64)
+            .get();
+    }
+
+    public String unwrap(String payload) {
+        return Optional.of(payload)
+            .map(this::decodeURLBase64)
+            .map(this::parseString).get();
+    }
 }

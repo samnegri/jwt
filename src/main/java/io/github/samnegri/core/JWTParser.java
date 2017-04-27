@@ -22,48 +22,41 @@ public class JWTParser {
     }
 
     public String create(JWT jwt) {
-        Map<String,String> header = jwt.getHeader();
+        Map<String, String> header = jwt.getHeader();
         header.put("alg", signer.getAlgorithm().getName());
-        String header64encoded = wrap(Json.toJson(header));
-        String payload64encoded = wrap(jwt.getPayload());
+        String header64encoded = base64.wrap(Json.toJson(header));
+        String payload64encoded = base64.wrap(jwt.getPayload());
 
-        return Optional.of(String.join(".", header64encoded, payload64encoded))
-            .map(base64::getBytes)
-            .map(signer::sign)
-            .map(base64::encodeURLBase64)
-            .map(jwtSignature -> String.join(".", header64encoded, payload64encoded, jwtSignature))
-            .get();
+        String signature = sign(header64encoded, payload64encoded);
+        return String.join(".", header64encoded, payload64encoded, signature);
     }
 
     public JWT validate(String token) {
         String[] tokenSplitted = token.split(Pattern.quote("."));
-        String data = tokenSplitted[0] + "." + tokenSplitted[1];
-        String signed = tokenSplitted[2];
+        return validate(tokenSplitted[0], tokenSplitted[1], tokenSplitted[2]);
+    }
 
-        HashMap<String, String> header = (HashMap<String, String>) Json.fromJson(unwrap(tokenSplitted[0]).get());
-        String payload = unwrap(tokenSplitted[1]).get();
-        JWT jwt = new JWT(header,payload,signed);
-
-        Optional.of(data)
+    private String sign(String header64encoded, String payload64encoded) {
+        return Optional.of(String.join(".", header64encoded, payload64encoded))
             .map(base64::getBytes)
             .map(signer::sign)
-            .map(base64::encodeURLBase64)
-            .filter(signed::equals)
-            .get();
-        return jwt;
+            .map(base64::encodeURLBase64).get();
+    }
+
+    private JWT validate(String headerBase64, String payload64, String tokenSignature) {
+        checkSignature(headerBase64, payload64, tokenSignature);
+
+        Map header = Json.fromJson(base64.unwrap(headerBase64), HashMap.class);
+        String payload = base64.unwrap(payload64);
+
+        return new JWT(header, payload, tokenSignature);
 
     }
 
-    private String wrap(String payload) {
-        return Optional.of(payload)
-            .map(base64::getBytes)
-            .map(base64::encodeURLBase64)
-            .get();
-    }
-
-    private Optional<String> unwrap(String payload) {
-        return Optional.of(payload)
-            .map(base64::decodeURLBase64)
-            .map(base64::parseString);
+    private void checkSignature(String headerBase64, String payload64, String tokenSignature) {
+        String signature = sign(headerBase64, payload64);
+        if (!signature.equals(tokenSignature)) {
+            throw new RuntimeException("Invalid Token");
+        }
     }
 }
