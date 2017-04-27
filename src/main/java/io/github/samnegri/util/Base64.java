@@ -1,5 +1,7 @@
 package io.github.samnegri.util;
 
+import io.github.samnegri.exception.EncodingException;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.util.Optional;
@@ -36,7 +38,7 @@ public class Base64 {
         try {
             return json.getBytes(encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new EncodingException(String.format("Encoding %s not supported", encoding), e);
         }
     }
 
@@ -44,7 +46,7 @@ public class Base64 {
         try {
             return new String(bytes,encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new EncodingException(String.format("Encoding %s not supported", encoding), e);
         }
     }
 

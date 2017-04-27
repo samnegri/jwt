@@ -1,5 +1,7 @@
 package io.github.samnegri.core;
 
+import io.github.samnegri.exception.SignatureException;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
@@ -26,9 +28,9 @@ public class HMACSHA256Signer implements Signer {
             hmacSHA256.init(key);
             return hmacSHA256.doFinal(toBeSigned);
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new SignatureException("Invalid algorithm for signing: ", e);
         } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
+            throw new SignatureException("Invalid key for signing: ", e);
         }
     }
 
