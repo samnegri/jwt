@@ -2,7 +2,8 @@ package io.github.samnegri.core;
 
 public enum Algorithm {
     HMACSHA256("HSHA256", "HmacSHA256"),
-    HMACSHA384("HSHA384", "HmacSHA384");
+    HMACSHA384("HSHA384", "HmacSHA384"),
+    HMACSHA512("HSHA512", "HmacSHA512" );
 
     private final String name;
     private final String code;
