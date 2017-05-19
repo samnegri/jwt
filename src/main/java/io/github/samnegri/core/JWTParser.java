@@ -1,5 +1,6 @@
 package io.github.samnegri.core;
 
+import io.github.samnegri.exception.InvalidTokenException;
 import io.github.samnegri.util.Base64;
 import io.github.samnegri.util.Json;
 
@@ -33,6 +34,9 @@ public class JWTParser {
 
     public JWT validate(String token) {
         String[] tokenSplitted = token.split(Pattern.quote("."));
+        if (tokenSplitted.length != 3) {
+            throw new InvalidTokenException();
+        }
         return validate(tokenSplitted[0], tokenSplitted[1], tokenSplitted[2]);
     }
 
@@ -56,7 +60,7 @@ public class JWTParser {
     private void checkSignature(String headerBase64, String payload64, String tokenSignature) {
         String signature = sign(headerBase64, payload64);
         if (!signature.equals(tokenSignature)) {
-            throw new RuntimeException("Invalid Token");
+            throw new InvalidTokenException();
         }
     }
 }
