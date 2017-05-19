@@ -3,7 +3,13 @@ package io.github.samnegri.core;
 public class JWTSignerFactory {
 
     public static Signer getSignerFor(Algorithm algorithm, byte[] secret) {
-        return HMACSHA256Signer.getInstance(secret);
+        switch (algorithm) {
+            case HMACSHA256:
+                return HMACSHA256Signer.getInstance(secret);
+            case HMACSHA384:
+                return HMACSHA384Signer.getInstance(secret);
+        }
+        throw new RuntimeException();
     }
 
 }
