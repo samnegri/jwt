@@ -1,37 +1,16 @@
 package io.github.samnegri.core;
 
-import io.github.samnegri.exception.SignatureException;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-
-public class HMACSHA256Signer implements Signer {
-
-    private final byte[] secret;
+/**
+ * Created by Samuel Negri Morais on 5/19/17.
+ */
+public class HMACSHA256Signer extends Signer {
 
     private HMACSHA256Signer(byte[] secret) {
-        this.secret = secret;
+        super(secret);
     }
 
     public static Signer getInstance(byte[] secret) {
         return new HMACSHA256Signer(secret);
-    }
-
-    @Override
-    public byte[] sign(byte[] toBeSigned) {
-        try {
-            Mac hmacSHA256 = Mac.getInstance(Algorithm.HMACSHA256.getCode());
-            Key key = new SecretKeySpec(secret, Algorithm.HMACSHA256.getCode());
-            hmacSHA256.init(key);
-            return hmacSHA256.doFinal(toBeSigned);
-        } catch (NoSuchAlgorithmException e) {
-            throw new SignatureException("Invalid algorithm for signing: ", e);
-        } catch (InvalidKeyException e) {
-            throw new SignatureException("Invalid key for signing: ", e);
-        }
     }
 
     @Override

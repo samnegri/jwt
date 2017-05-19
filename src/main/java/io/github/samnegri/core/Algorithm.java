@@ -1,5 +1,13 @@
 package io.github.samnegri.core;
 
+import io.github.samnegri.exception.SignatureException;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+
 public enum Algorithm {
     HMACSHA256("HSHA256", "HmacSHA256"),
     HMACSHA384("HSHA384", "HmacSHA384"),
@@ -19,5 +27,18 @@ public enum Algorithm {
 
     public String getName() {
         return name;
+    }
+
+    byte[] encript(byte[] secret, byte[] toBeSigned) {
+        try {
+            Mac hmacSHA384 = Mac.getInstance(getCode());
+            Key key = new SecretKeySpec(secret, getCode());
+            hmacSHA384.init(key);
+            return hmacSHA384.doFinal(toBeSigned);
+        } catch (NoSuchAlgorithmException e) {
+            throw new SignatureException("Invalid algorithm for signing: ", e);
+        } catch (InvalidKeyException e) {
+            throw new SignatureException("Invalid key for signing: ", e);
+        }
     }
 }

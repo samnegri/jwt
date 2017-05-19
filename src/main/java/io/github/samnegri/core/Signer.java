@@ -1,8 +1,16 @@
 package io.github.samnegri.core;
 
-public interface Signer {
+public abstract class Signer {
 
-    byte[] sign(byte[] toBeSigned);
+    private final byte[] secret;
 
-    Algorithm getAlgorithm();
+    public Signer(byte[] secret) {
+        this.secret = secret;
+    }
+
+    byte[] sign(byte[] toBeSigned) {
+        return getAlgorithm().encript(secret, toBeSigned);
+    }
+
+    public abstract Algorithm getAlgorithm();
 }
