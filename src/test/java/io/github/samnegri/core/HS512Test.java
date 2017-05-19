@@ -1,6 +1,5 @@
 package io.github.samnegri.core;
 
-import io.github.samnegri.exception.InvalidTokenException;
 import io.github.samnegri.util.Json;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,21 +32,4 @@ public class HS512Test {
         assertThat(jwt.getHeader().get("alg"), is(Algorithm.HMACSHA512.getName()));
         assertThat(jwt.getPayload(), is(validate.getPayload()));
     }
-
-    @Test
-    public void invalidTokenTest() throws UnsupportedEncodingException {
-        rule.expect(InvalidTokenException.class);
-        String signedJson = "some.random.string";
-        JWTParser jwtParser = JWTParser.newInstance(Algorithm.HMACSHA256, "secret".getBytes(), "UTF-8");
-        jwtParser.validate(signedJson);
-    }
-
-    @Test
-    public void invalidToken2Test() throws UnsupportedEncodingException {
-        rule.expect(InvalidTokenException.class);
-        String signedJson = "invalidtokenstring";
-        JWTParser jwtParser = JWTParser.newInstance(Algorithm.HMACSHA256, "secret".getBytes(), "UTF-8");
-        jwtParser.validate(signedJson);
-    }
-
 }
